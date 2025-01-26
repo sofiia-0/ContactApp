@@ -7,49 +7,54 @@
 
 import CoreData
 
+// Controlador de persistencia para CoreData
 struct PersistenceController {
+    // Instancia compartida para acceso global
     static let shared = PersistenceController()
 
+    // Vista previa para pruebas sin datos reales
     static var preview: PersistenceController = {
-        let result = PersistenceController(inMemory: true)
-        let viewContext = result.container.viewContext
+        let result = PersistenceController(inMemory: true)  // Controlador en memoria
+        let viewContext = result.container.viewContext  // Contexto de vista de CoreData
+        
+        // Crear 10 elementos de ejemplo
         for _ in 0..<10 {
             let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
+            newItem.name = "Nombre de ejemplo"
+            newItem.phoneNumber = "123-456-7890"
         }
+        
+        // Guardar en el contexto de vista
         do {
             try viewContext.save()
         } catch {
-            // Replace this implementation with code to handle the error appropriately.
-            // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
             let nsError = error as NSError
-            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+            fatalError("Unresolved error \(nsError), \(nsError.userInfo)")  // Error fatal
         }
-        return result
+        
+        return result  // Controlador con datos de prueba en memoria
     }()
 
+    // Contenedor de la base de datos persistente
     let container: NSPersistentContainer
 
+    // Inicializador
     init(inMemory: Bool = false) {
+        // Configurar el contenedor con el nombre del modelo
         container = NSPersistentContainer(name: "ContactApp")
+        
+        // Usar base de datos en memoria si es necesario
         if inMemory {
             container.persistentStoreDescriptions.first!.url = URL(fileURLWithPath: "/dev/null")
         }
+        
+        // Fusionar cambios automáticamente
         container.viewContext.automaticallyMergesChangesFromParent = true
+        
+        // Cargar las tiendas persistentes
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-
-                /*
-                Typical reasons for an error here include:
-                * The parent directory does not exist, cannot be created, or disallows writing.
-                * The persistent store is not accessible, due to permissions or data protection when the device is locked.
-                * The device is out of space.
-                * The store could not be migrated to the current model version.
-                Check the error message to determine what the actual problem was.
-                */
-                fatalError("Unresolved error \(error), \(error.userInfo)")
+                fatalError("Unresolved error \(error), \(error.userInfo)")  // Error fatal
             }
         })
     }
